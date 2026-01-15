@@ -106,23 +106,22 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
           {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono transition-colors ${
-                  s === step
-                    ? 'bg-cyan/20 border border-cyan text-cyan'
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${s === step
+                    ? 'bg-apple text-white'
                     : s < step
-                    ? 'bg-cyan/10 border border-cyan/30 text-cyan/60'
-                    : 'bg-void-200 border border-void-300 text-slate-500'
-                }`}
+                      ? 'bg-apple-100 border border-apple-200 text-apple'
+                      : 'bg-cloud-200 border border-cloud-400 text-ink-50'
+                  }`}
               >
                 {s < step ? '✓' : s}
               </div>
               {s < 4 && (
-                <div className={`w-12 h-0.5 ${s < step ? 'bg-cyan/30' : 'bg-void-300'}`} />
+                <div className={`w-12 h-0.5 ${s < step ? 'bg-apple-200' : 'bg-cloud-300'}`} />
               )}
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-2 text-xs text-slate-500 font-mono px-1">
+        <div className="flex justify-between mt-2 text-xs text-ink-50 font-medium px-1">
           <span>Name</span>
           <span>Model</span>
           <span>Schema</span>
@@ -140,7 +139,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             className="space-y-4"
           >
             <div>
-              <label className="block text-sm text-slate-400 mb-2">Collection Name</label>
+              <label className="block text-sm text-ink-200 mb-2 font-medium">Collection Name</label>
               <input
                 type="text"
                 value={name}
@@ -149,7 +148,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
                 className="input-glow w-full font-mono"
                 autoFocus
               />
-              <p className="text-xs text-slate-500 mt-2">
+              <p className="text-xs text-ink-50 mt-2">
                 Lowercase letters, numbers, hyphens, and underscores only
               </p>
             </div>
@@ -165,7 +164,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             className="space-y-4"
           >
             <div>
-              <label className="block text-sm text-slate-400 mb-3">Modality</label>
+              <label className="block text-sm text-ink-200 mb-3 font-medium">Modality</label>
               <div className="grid grid-cols-2 gap-3">
                 {(['text', 'image'] as Modality[]).map((m) => (
                   <button
@@ -174,13 +173,12 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
                       setModality(m);
                       setModel(m === 'text' ? 'all-MiniLM-L6-v2' : 'clip-ViT-B-32');
                     }}
-                    className={`p-4 rounded-xl border transition-all ${
-                      modality === m
+                    className={`p-4 rounded-xl border transition-all ${modality === m
                         ? m === 'text'
-                          ? 'bg-cyan/10 border-cyan/50 text-cyan'
-                          : 'bg-amber/10 border-amber/50 text-amber'
-                        : 'bg-void-200/50 border-void-300 text-slate-400 hover:border-slate-500'
-                    }`}
+                          ? 'bg-apple-50 border-apple text-apple'
+                          : 'bg-apricot-50 border-apricot text-apricot'
+                        : 'bg-cloud-100 border-cloud-400 text-ink-200 hover:border-ink-50'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       {m === 'text' ? (
@@ -201,29 +199,28 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             </div>
 
             <div>
-              <label className="block text-sm text-slate-400 mb-3">Embedding Model</label>
+              <label className="block text-sm text-ink-200 mb-3 font-medium">Embedding Model</label>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {availableModels.map((m) => (
                   <button
                     key={m}
                     onClick={() => setModel(m)}
-                    className={`w-full p-3 rounded-lg border text-left transition-all ${
-                      model === m
+                    className={`w-full p-3 rounded-xl border text-left transition-all ${model === m
                         ? modality === 'text'
-                          ? 'bg-cyan/10 border-cyan/50'
-                          : 'bg-amber/10 border-amber/50'
-                        : 'bg-void-200/50 border-void-300 hover:border-slate-500'
-                    }`}
+                          ? 'bg-apple-50 border-apple'
+                          : 'bg-apricot-50 border-apricot'
+                        : 'bg-cloud-100 border-cloud-400 hover:border-ink-50'
+                      }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className={`font-mono text-sm ${model === m ? (modality === 'text' ? 'text-cyan' : 'text-amber') : 'text-slate-300'}`}>
+                      <span className={`font-mono text-sm font-medium ${model === m ? (modality === 'text' ? 'text-apple' : 'text-apricot') : 'text-ink-300'}`}>
                         {m}
                       </span>
-                      <span className="text-xs font-mono text-slate-500">
+                      <span className="text-xs font-medium text-ink-50">
                         {MODEL_INFO[m]?.dims}d
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">{MODEL_INFO[m]?.desc}</p>
+                    <p className="text-xs text-ink-50 mt-1">{MODEL_INFO[m]?.desc}</p>
                   </button>
                 ))}
               </div>
@@ -240,19 +237,19 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             className="space-y-4"
           >
             <div className="flex items-center justify-between">
-              <label className="text-sm text-slate-400">Index Schema (Optional)</label>
+              <label className="text-sm text-ink-200 font-medium">Index Schema (Optional)</label>
               <button
                 onClick={addField}
-                className="text-xs text-cyan hover:text-cyan-400 transition-colors"
+                className="text-xs text-apple hover:text-apple-600 font-medium transition-colors"
               >
                 + Add Field
               </button>
             </div>
 
             {fields.length === 0 ? (
-              <div className="text-center py-8 border border-dashed border-void-300 rounded-lg">
-                <p className="text-sm text-slate-500">No fields defined</p>
-                <p className="text-xs text-slate-600 mt-1">Add fields to enable filtering on document metadata</p>
+              <div className="text-center py-8 border border-dashed border-cloud-400 rounded-xl bg-cloud-100">
+                <p className="text-sm text-ink-100">No fields defined</p>
+                <p className="text-xs text-ink-50 mt-1">Add fields to enable filtering on document metadata</p>
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -276,7 +273,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
                     </select>
                     <button
                       onClick={() => removeField(field.id)}
-                      className="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                      className="p-2 text-ink-50 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -297,29 +294,29 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             exit={{ opacity: 0, x: -20 }}
             className="space-y-4"
           >
-            <div className="glass rounded-lg p-4 space-y-3">
+            <div className="bg-cloud-100 rounded-xl p-4 space-y-3 border border-cloud-300">
               <div className="flex justify-between">
-                <span className="text-sm text-slate-500">Name</span>
-                <span className="text-sm font-mono text-slate-200">{name}</span>
+                <span className="text-sm text-ink-50">Name</span>
+                <span className="text-sm font-mono text-ink font-medium">{name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-500">Modality</span>
-                <span className={`text-sm font-mono ${modality === 'text' ? 'text-cyan' : 'text-amber'}`}>
+                <span className="text-sm text-ink-50">Modality</span>
+                <span className={`text-sm font-medium ${modality === 'text' ? 'text-apple' : 'text-apricot'}`}>
                   {modality}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-500">Model</span>
-                <span className="text-sm font-mono text-slate-200">{model}</span>
+                <span className="text-sm text-ink-50">Model</span>
+                <span className="text-sm font-mono text-ink font-medium">{model}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-500">Dimensions</span>
-                <span className="text-sm font-mono text-violet">{MODEL_INFO[model]?.dims}</span>
+                <span className="text-sm text-ink-50">Dimensions</span>
+                <span className="text-sm font-mono text-grape font-medium">{MODEL_INFO[model]?.dims}</span>
               </div>
               {fields.filter((f) => f.name.trim()).length > 0 && (
                 <div>
-                  <span className="text-sm text-slate-500 block mb-2">Schema</span>
-                  <div className="bg-void-200/50 rounded p-2 font-mono text-xs text-slate-400">
+                  <span className="text-sm text-ink-50 block mb-2">Schema</span>
+                  <div className="bg-cloud-200 rounded-lg p-2 font-mono text-xs text-ink-200">
                     {fields
                       .filter((f) => f.name.trim())
                       .map((f) => `${f.name}: ${f.type}`)
@@ -330,17 +327,17 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex justify-between mt-6 pt-4 border-t border-white/5">
+      <div className="flex justify-between mt-6 pt-4 border-t border-cloud-300">
         <GlowButton
-          variant="violet"
+          variant="grape"
           size="sm"
           onClick={() => setStep(Math.max(1, step - 1))}
           disabled={step === 1}
@@ -349,7 +346,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
         </GlowButton>
         {step < 4 ? (
           <GlowButton
-            variant="cyan"
+            variant="apple"
             size="sm"
             onClick={() => setStep(Math.min(4, step + 1))}
             disabled={!canProceed()}
@@ -358,7 +355,7 @@ export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModal
           </GlowButton>
         ) : (
           <GlowButton
-            variant="cyan"
+            variant="apple"
             size="sm"
             onClick={handleSubmit}
             disabled={isPending || !canProceed()}

@@ -41,7 +41,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-void/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-ink/20 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
@@ -49,17 +49,17 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`relative w-full ${sizeClasses[size]} glass rounded-2xl overflow-hidden`}
+            className={`relative w-full ${sizeClasses[size]} bg-white rounded-2xl shadow-soft-xl overflow-hidden border border-cloud-300`}
           >
             {title && (
-              <div className="px-6 py-4 border-b border-white/5">
-                <h2 className="text-xl font-semibold text-slate-100">{title}</h2>
+              <div className="px-6 py-4 border-b border-cloud-300">
+                <h2 className="text-xl font-semibold text-ink font-display">{title}</h2>
               </div>
             )}
             <div className="p-6">{children}</div>
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-slate-500 hover:text-slate-300 transition-colors"
+              className="absolute top-4 right-4 p-2 text-ink-50 hover:text-ink-200 hover:bg-cloud-200 rounded-lg transition-all"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

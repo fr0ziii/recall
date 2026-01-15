@@ -105,27 +105,26 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
 
   if (fields.length === 0) {
     return (
-      <div className="glass rounded-xl p-4">
-        <h3 className="text-sm font-medium text-slate-400 mb-2">Filters</h3>
-        <p className="text-xs text-slate-500">No filterable fields in schema</p>
+      <div className="bg-white rounded-xl p-4 border border-cloud-300 shadow-soft">
+        <h3 className="text-sm font-medium text-ink-200 mb-2">Filters</h3>
+        <p className="text-xs text-ink-50">No filterable fields in schema</p>
       </div>
     );
   }
 
   return (
-    <div className="glass rounded-xl p-4">
+    <div className="bg-white rounded-xl p-4 border border-cloud-300 shadow-soft">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-slate-400">Filters</h3>
+        <h3 className="text-sm font-medium text-ink-200">Filters</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowDsl(!showDsl)}
-            className={`text-xs px-2 py-1 rounded transition-colors ${
-              showDsl ? 'bg-violet/20 text-violet' : 'text-slate-500 hover:text-slate-300'
-            }`}
+            className={`text-xs px-2 py-1 rounded-lg transition-colors ${showDsl ? 'bg-grape-100 text-grape' : 'text-ink-50 hover:text-ink-200 hover:bg-cloud-200'
+              }`}
           >
             DSL
           </button>
-          <button onClick={addCondition} className="text-xs text-cyan hover:text-cyan-400 transition-colors">
+          <button onClick={addCondition} className="text-xs text-apple hover:text-apple-600 font-medium transition-colors">
             + Add
           </button>
         </div>
@@ -133,17 +132,16 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
 
       {conditions.length > 1 && (
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-xs text-slate-500">Combine with:</span>
-          <div className="flex rounded-lg overflow-hidden border border-void-300">
+          <span className="text-xs text-ink-50 font-medium">Combine with:</span>
+          <div className="flex rounded-lg overflow-hidden border border-cloud-400">
             {(['AND', 'OR'] as const).map((op) => (
               <button
                 key={op}
                 onClick={() => handleLogicalOpChange(op)}
-                className={`px-3 py-1 text-xs font-mono transition-colors ${
-                  logicalOp === op
-                    ? 'bg-cyan/20 text-cyan'
-                    : 'bg-void-200/50 text-slate-400 hover:text-slate-200'
-                }`}
+                className={`px-3 py-1 text-xs font-medium transition-colors ${logicalOp === op
+                    ? 'bg-apple text-white'
+                    : 'bg-cloud-100 text-ink-100 hover:text-ink'
+                  }`}
               >
                 {op}
               </button>
@@ -154,8 +152,8 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
 
       <AnimatePresence>
         {conditions.length === 0 ? (
-          <div className="text-center py-4 border border-dashed border-void-300 rounded-lg">
-            <p className="text-xs text-slate-500">No filters applied</p>
+          <div className="text-center py-4 border border-dashed border-cloud-400 rounded-xl bg-cloud-100">
+            <p className="text-xs text-ink-50">No filters applied</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -172,10 +170,10 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
                   className="flex items-center gap-2"
                 >
                   {index > 0 && (
-                    <span className="text-xs text-violet font-mono w-8">{logicalOp}</span>
+                    <span className="text-xs text-grape font-medium w-8">{logicalOp}</span>
                   )}
                   {index === 0 && conditions.length > 1 && <span className="w-8" />}
-                  
+
                   <select
                     value={condition.field}
                     onChange={(e) => updateCondition(condition.id, 'field', e.target.value)}
@@ -210,7 +208,7 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
 
                   <button
                     onClick={() => removeCondition(condition.id)}
-                    className="p-1.5 text-slate-500 hover:text-red-400 transition-colors"
+                    className="p-1.5 text-ink-50 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -231,8 +229,8 @@ export function FilterBuilder({ schema, filter, onChange }: FilterBuilderProps) 
             exit={{ opacity: 0, height: 0 }}
             className="mt-4 overflow-hidden"
           >
-            <div className="bg-void-200/50 rounded-lg p-3 border border-void-300">
-              <pre className="text-xs font-mono text-slate-400 overflow-x-auto">
+            <div className="bg-cloud-100 rounded-lg p-3 border border-cloud-300">
+              <pre className="text-xs font-mono text-ink-200 overflow-x-auto">
                 {JSON.stringify(filter, null, 2)}
               </pre>
             </div>

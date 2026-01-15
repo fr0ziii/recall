@@ -21,10 +21,10 @@ function AppContent() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative bg-cloud-100">
       <ParticleField />
       <div className="gradient-mesh fixed inset-0 pointer-events-none" />
-      
+
       <Header />
 
       <main className="relative z-10 pt-[89px] px-6 pb-12">

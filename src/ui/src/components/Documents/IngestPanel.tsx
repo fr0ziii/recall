@@ -98,7 +98,7 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-void/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-ink/20 backdrop-blur-sm z-40"
             onClick={onClose}
           />
           <motion.div
@@ -106,19 +106,19 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-xl glass border-l border-white/5 z-50 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-xl bg-white border-l border-cloud-300 shadow-soft-xl z-50 flex flex-col"
           >
-            <div className="p-6 border-b border-white/5">
+            <div className="p-6 border-b border-cloud-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-100">Ingest Documents</h2>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Add documents to <span className="text-cyan font-mono">{collectionName}</span>
+                  <h2 className="text-xl font-semibold text-ink font-display">Ingest Documents</h2>
+                  <p className="text-sm text-ink-100 mt-1">
+                    Add documents to <span className="text-apple font-medium">{collectionName}</span>
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="p-2 text-ink-50 hover:text-ink-200 hover:bg-cloud-200 rounded-lg transition-all"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -129,7 +129,7 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
 
             <div className="flex-1 overflow-y-auto p-6">
               <div className="mb-6">
-                <label className="text-sm text-slate-400 block mb-3">Input Mode</label>
+                <label className="text-sm text-ink-200 block mb-3 font-medium">Input Mode</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { id: 'text', label: 'Plain Text', icon: '📝' },
@@ -139,11 +139,10 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                     <button
                       key={m.id}
                       onClick={() => setMode(m.id)}
-                      className={`p-3 rounded-lg border text-center transition-all ${
-                        mode === m.id
-                          ? 'bg-cyan/10 border-cyan/50 text-cyan'
-                          : 'bg-void-200/50 border-void-300 text-slate-400 hover:border-slate-500'
-                      }`}
+                      className={`p-3 rounded-xl border text-center transition-all ${mode === m.id
+                          ? 'bg-apple-50 border-apple text-apple'
+                          : 'bg-cloud-100 border-cloud-400 text-ink-200 hover:border-ink-50'
+                        }`}
                     >
                       <span className="block text-lg mb-1">{m.icon}</span>
                       <span className="text-xs font-medium">{m.label}</span>
@@ -160,8 +159,8 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    <label className="text-sm text-slate-400 block mb-2">
-                      Text Content <span className="text-slate-600">(one document per line)</span>
+                    <label className="text-sm text-ink-200 block mb-2 font-medium">
+                      Text Content <span className="text-ink-50 font-normal">(one document per line)</span>
                     </label>
                     <textarea
                       value={textContent}
@@ -179,8 +178,8 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    <label className="text-sm text-slate-400 block mb-2">
-                      JSON Documents <span className="text-slate-600">(array or single object)</span>
+                    <label className="text-sm text-ink-200 block mb-2 font-medium">
+                      JSON Documents <span className="text-ink-50 font-normal">(array or single object)</span>
                     </label>
                     <textarea
                       value={jsonContent}
@@ -209,8 +208,8 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    <label className="text-sm text-slate-400 block mb-2">
-                      Content URLs <span className="text-slate-600">(one URL per line)</span>
+                    <label className="text-sm text-ink-200 block mb-2 font-medium">
+                      Content URLs <span className="text-ink-50 font-normal">(one URL per line)</span>
                     </label>
                     <textarea
                       value={urlsContent}
@@ -226,9 +225,9 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg"
+                  className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl"
                 >
-                  <p className="text-sm text-red-400">{error}</p>
+                  <p className="text-sm text-red-600">{error}</p>
                 </motion.div>
               )}
 
@@ -236,15 +235,15 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg"
+                  className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm font-medium text-emerald-400">Ingestion Queued</span>
+                    <span className="text-sm font-medium text-emerald-700">Ingestion Queued</span>
                   </div>
-                  <div className="space-y-1 text-xs font-mono text-slate-400">
+                  <div className="space-y-1 text-xs font-mono text-ink-200">
                     <p>Task ID: {result.task_id}</p>
                     <p>Documents queued: {result.documents_queued}</p>
                     <p>Status: {result.status}</p>
@@ -253,20 +252,20 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
               )}
             </div>
 
-            <div className="p-6 border-t border-white/5 bg-void-50/50">
+            <div className="p-6 border-t border-cloud-300 bg-cloud-100">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-slate-500">
-                  <span className="text-cyan font-mono">{getDocumentCount()}</span> documents ready
+                <span className="text-sm text-ink-100">
+                  <span className="text-apple font-medium">{getDocumentCount()}</span> documents ready
                 </span>
                 <button
                   onClick={handleReset}
-                  className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                  className="text-xs text-ink-50 hover:text-ink-200 font-medium transition-colors"
                 >
                   Clear all
                 </button>
               </div>
               <GlowButton
-                variant="cyan"
+                variant="apple"
                 size="md"
                 onClick={handleSubmit}
                 disabled={isPending || getDocumentCount() === 0}

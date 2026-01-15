@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: 'cyan' | 'amber' | 'violet';
+  color?: 'apple' | 'apricot' | 'grape';
 }
 
 const sizeClasses = {
@@ -12,12 +12,12 @@ const sizeClasses = {
 };
 
 const colorClasses = {
-  cyan: 'border-cyan',
-  amber: 'border-amber',
-  violet: 'border-violet',
+  apple: 'border-apple',
+  apricot: 'border-apricot',
+  grape: 'border-grape',
 };
 
-export function LoadingSpinner({ size = 'md', color = 'cyan' }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'md', color = 'apple' }: LoadingSpinnerProps) {
   return (
     <motion.div
       className={`${sizeClasses[size]} border-2 ${colorClasses[color]} border-t-transparent rounded-full`}
@@ -33,10 +33,10 @@ export function LoadingOverlay({ message = 'Loading...' }: { message?: string })
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 flex flex-col items-center justify-center bg-void/80 backdrop-blur-sm z-50"
+      className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-50 rounded-2xl"
     >
       <LoadingSpinner size="lg" />
-      <p className="mt-4 text-slate-400 font-mono text-sm">{message}</p>
+      <p className="mt-4 text-ink-100 font-medium text-sm">{message}</p>
     </motion.div>
   );
 }
