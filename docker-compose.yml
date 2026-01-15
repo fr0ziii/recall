@@ -1,0 +1,109 @@
+x-backend-env: &backend-env
+  REDIS_URL: redis://redis:6379
+  QDRANT_URL: http://qdrant:6333
+
+x-backend-base: &backend-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment: *backend-env
+  volumes:
+    - ./src:/app/src:ro
+  networks:
+    - backend
+
+services:
+  ui:
+    build:
+      context: ./src/ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - backend
+
+  api:
+    <<: *backend-base
+    command: uvicorn recall.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *backend-env
+      DEBUG: "true"
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import sys, urllib.request, socket
+          socket.setdefaulttimeout(2)
+          try:
+              with urllib.request.urlopen("http://localhost:8000/health") as resp:
+                  sys.exit(0 if resp.status == 200 else 1)
+          except Exception:
+              sys.exit(1)
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  worker:
+    <<: *backend-base
+    command: arq recall.workers.tasks.WorkerSettings
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - backend
+
+  qdrant:
+    image: qdrant/qdrant:1.12.4
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - backend
+
+volumes:
+  redis_data:
+  qdrant_data:
+
+networks:
+  backend:
+    driver: bridge
