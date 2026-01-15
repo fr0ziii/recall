@@ -20,14 +20,17 @@ recall/
 ├── src/recall/
 │   ├── main.py              # FastAPI app entry point
 │   ├── config.py            # Settings via pydantic-settings
-│   ├── models/              # Pydantic schemas (collection, document, search, errors)
+│   ├── models/              # Pydantic schemas (collection, document, search, errors, task)
 │   ├── core/
 │   │   ├── embedders/       # BaseEmbedder ABC + TextEmbedder, CLIPEmbedder, Factory
 │   │   ├── vectordb/        # VectorDBClient ABC + QdrantAdapter, Factory
-│   │   └── transpiler/      # DSL → Qdrant filter transpiler
-│   ├── services/            # Business logic (registry, ingestion, search)
-│   ├── api/v1/              # FastAPI routers (collections, documents, search)
+│   │   ├── transpiler/      # DSL → Qdrant filter transpiler
+│   │   └── utils.py         # Deterministic UUID generation for idempotent upserts
+│   ├── services/            # Business logic (registry, ingestion, search, schema_validator)
+│   ├── api/v1/              # FastAPI routers (collections, documents, search, tasks)
 │   └── workers/             # Arq background tasks
+├── scripts/
+│   └── preload_models.py    # Pre-download models for Docker image baking
 ├── tests/
 │   ├── conftest.py          # Shared fixtures
 │   ├── unit/                # Unit tests (models, services, transpiler, embedders)
@@ -44,6 +47,8 @@ recall/
 - **Factory Pattern**: `EmbedderFactory` and `VectorDBFactory` for instance creation
 - **Dependency Injection**: FastAPI `Depends()` for services
 - **Schema-on-Write**: Collection schemas defined at creation time
+- **Dynamic Schema Validation**: Pydantic `create_model()` for runtime payload validation
+- **Idempotent Upserts**: Deterministic UUID5 generation for consistent vector IDs
 
 ## Commands
 
@@ -99,8 +104,9 @@ uv run ruff check src/ tests/ --fix
 | GET | `/v1/collections` | List collections |
 | GET | `/v1/collections/{name}` | Get collection config |
 | DELETE | `/v1/collections/{name}` | Delete collection |
-| POST | `/v1/collections/{name}/documents` | Ingest documents (async) |
+| POST | `/v1/collections/{name}/documents` | Ingest documents (validates payload, async) |
 | POST | `/v1/collections/{name}/search` | Semantic search |
+| GET | `/v1/tasks/{task_id}` | Poll async task status |
 | GET | `/v1/collections/models/supported` | List supported models |
 | GET | `/health` | Health check |
 

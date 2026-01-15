@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from recall.api.v1.dependencies import get_ingestion_service
 from recall.models.document import IngestRequest, IngestResponse
-from recall.models.errors import CollectionNotFoundError
+from recall.models.errors import CollectionNotFoundError, SchemaValidationError
 from recall.services.ingestion import IngestionService
 
 router = APIRouter(prefix="/collections/{collection_name}/documents")
@@ -30,5 +30,10 @@ async def ingest_documents(
     except CollectionNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except SchemaValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=e.message,
         )

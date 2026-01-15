@@ -4,10 +4,20 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from recall.models.collection import Collection, EmbeddingConfig, Modality
 from recall.models.document import Document, IngestRequest
 from recall.models.errors import CollectionNotFoundError
 from recall.services.ingestion import IngestionService
 from recall.services.registry import SchemaRegistry
+
+
+def _make_mock_collection(name: str = "test-collection") -> Collection:
+    """Create a mock collection for testing."""
+    return Collection(
+        name=name,
+        embedding_config=EmbeddingConfig(model="all-MiniLM-L6-v2", modality=Modality.TEXT),
+        index_schema={},
+    )
 
 
 @pytest.mark.unit
@@ -18,7 +28,7 @@ class TestIngestionService:
     def mock_registry(self):
         """Create a mock registry."""
         registry = AsyncMock(spec=SchemaRegistry)
-        registry.exists = AsyncMock(return_value=True)
+        registry.get = AsyncMock(return_value=_make_mock_collection())
         return registry
 
     @pytest.fixture
@@ -83,7 +93,7 @@ class TestIngestionService:
 
     async def test_ingest_collection_not_found(self, mock_arq_redis):
         registry = AsyncMock(spec=SchemaRegistry)
-        registry.exists = AsyncMock(return_value=False)
+        registry.get = AsyncMock(side_effect=CollectionNotFoundError("nonexistent"))
 
         service = IngestionService(registry, mock_arq_redis)
         request = IngestRequest(

@@ -48,11 +48,13 @@ POST /v1/collections/products/search
 ## Features
 
 - **Schema-on-Write** — Define collection schemas dynamically at creation time
+- **Dynamic Schema Enforcement** — Payloads validated against schema before ingestion (422 on mismatch)
 - **Multimodal Support** — Text and image embeddings with pluggable models
 - **Hybrid Search** — Combine semantic similarity with structured filters
-- **Async Pipeline** — Non-blocking ingestion with background workers
+- **Async Pipeline** — Non-blocking ingestion with background workers and status polling
+- **Idempotent Ingestion** — Deterministic vector IDs ensure re-ingestion updates rather than duplicates
 - **Filter DSL** — Expressive query language that transpiles to native DB filters
-- **Production Ready** — Typed errors, health checks, and Docker support
+- **Production Ready** — Typed errors, health checks, model baking, and Docker support
 
 ## Quick Start
 
@@ -60,7 +62,7 @@ POST /v1/collections/products/search
 
 ```bash
 # Clone and start all services
-git clone https://github.com/your-org/recall.git
+git clone https://github.com/fr0ziii/recall.git
 cd recall
 docker compose up -d
 
@@ -143,7 +145,14 @@ curl -X POST http://localhost:8000/v1/collections/articles/documents \
 # Returns: { "task_id": "...", "documents_queued": 2, "status": "queued" }
 ```
 
-### 3. Search
+### 3. Poll Task Status (Optional)
+
+```bash
+curl http://localhost:8000/v1/tasks/{task_id}
+# Returns: { "task_id": "...", "jobs": [...], "summary": { "total": 2, "complete": 2, ... } }
+```
+
+### 4. Search
 
 ```bash
 curl -X POST http://localhost:8000/v1/collections/articles/search \
@@ -176,7 +185,13 @@ curl -X POST http://localhost:8000/v1/collections/articles/search \
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/v1/collections/{name}/documents` | Queue documents for ingestion |
+| `POST` | `/v1/collections/{name}/documents` | Queue documents for ingestion (validates payload against schema) |
+
+### Tasks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/v1/tasks/{task_id}` | Poll async ingestion task status |
 
 ### Search
 
@@ -349,7 +364,7 @@ recall/
 
 ### Running Tests
 
-The project includes a comprehensive test suite with 160+ tests covering unit, integration, and performance testing.
+The project includes a comprehensive test suite with 190+ tests covering unit, integration, and performance testing.
 
 ```bash
 # Unit tests (fast, no external dependencies)
@@ -401,6 +416,8 @@ uv run ruff format src/ tests/
 
 ### Docker Production Build
 
+The Dockerfile uses a multi-stage build that pre-downloads all embedding models during the build phase, eliminating cold-start latency from HuggingFace downloads at runtime.
+
 ```bash
 docker build -t recall:latest .
 docker run -p 8000:8000 \
@@ -430,7 +447,7 @@ Use this for container orchestration health probes.
 
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Contributions are welcome!
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)

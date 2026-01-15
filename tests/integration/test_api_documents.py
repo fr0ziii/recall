@@ -36,7 +36,7 @@ class TestDocumentsAPI:
                     {
                         "id": "doc-1",
                         "content_raw": "Test document content",
-                        "payload": {"category": "test"},
+                        "payload": {"category": "test", "price": 19.99},
                     }
                 ]
             },
@@ -52,9 +52,21 @@ class TestDocumentsAPI:
             "/v1/collections/docs-test/documents",
             json={
                 "documents": [
-                    {"id": "doc-1", "content_raw": "First document"},
-                    {"id": "doc-2", "content_raw": "Second document"},
-                    {"id": "doc-3", "content_raw": "Third document"},
+                    {
+                        "id": "doc-1",
+                        "content_raw": "First document",
+                        "payload": {"category": "a", "price": 1.0},
+                    },
+                    {
+                        "id": "doc-2",
+                        "content_raw": "Second document",
+                        "payload": {"category": "b", "price": 2.0},
+                    },
+                    {
+                        "id": "doc-3",
+                        "content_raw": "Third document",
+                        "payload": {"category": "c", "price": 3.0},
+                    },
                 ]
             },
         )
@@ -69,6 +81,7 @@ class TestDocumentsAPI:
                     {
                         "id": "doc-uri",
                         "content_uri": "https://example.com/document.txt",
+                        "payload": {"category": "uri-test", "price": 0.0},
                     }
                 ]
             },
@@ -80,7 +93,7 @@ class TestDocumentsAPI:
             "/v1/collections/nonexistent/documents",
             json={
                 "documents": [
-                    {"id": "doc-1", "content_raw": "Test"}
+                    {"id": "doc-1", "content_raw": "Test", "payload": {}}
                 ]
             },
         )
@@ -94,7 +107,10 @@ class TestDocumentsAPI:
         assert response.status_code == 422
 
     async def test_ingest_too_many_documents_rejected(self, client: AsyncClient):
-        docs = [{"id": f"doc-{i}", "content_raw": "x"} for i in range(101)]
+        docs = [
+            {"id": f"doc-{i}", "content_raw": "x", "payload": {"category": "x", "price": 1.0}}
+            for i in range(101)
+        ]
         response = await client.post(
             "/v1/collections/docs-test/documents",
             json={"documents": docs},

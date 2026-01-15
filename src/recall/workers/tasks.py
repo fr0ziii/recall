@@ -8,6 +8,7 @@ from redis.asyncio import Redis
 
 from recall.config import get_settings
 from recall.core.embedders.factory import EmbedderFactory
+from recall.core.utils import deterministic_vector_id
 from recall.core.vectordb.base import Point
 from recall.core.vectordb.qdrant import QdrantAdapter
 from recall.services.registry import SchemaRegistry
@@ -73,10 +74,11 @@ async def embed_document(
 
     vector = embedder.embed(content)
 
+    vector_id = deterministic_vector_id(collection_name, doc_id)
     point = Point(
-        id=doc_id,
+        id=vector_id,
         vector=vector,
-        payload=payload or {},
+        payload={**(payload or {}), "_doc_id": doc_id},
     )
 
     await vectordb.upsert(collection_name, [point])

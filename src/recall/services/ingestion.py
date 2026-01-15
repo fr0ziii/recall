@@ -6,8 +6,8 @@ import httpx
 from arq import ArqRedis
 
 from recall.models.document import IngestRequest, IngestResponse
-from recall.models.errors import CollectionNotFoundError
 from recall.services.registry import SchemaRegistry
+from recall.services.schema_validator import validate_payload
 
 
 class IngestionService:
@@ -33,9 +33,12 @@ class IngestionService:
 
         Raises:
             CollectionNotFoundError: If collection doesn't exist
+            SchemaValidationError: If document payload doesn't match schema
         """
-        if not await self._registry.exists(collection_name):
-            raise CollectionNotFoundError(collection_name)
+        collection = await self._registry.get(collection_name)
+
+        for doc in request.documents:
+            validate_payload(doc.payload, collection.index_schema, str(doc.id))
 
         batch_id = str(uuid4())
 

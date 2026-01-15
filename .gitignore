@@ -73,3 +73,7 @@ logs/
 
 # Docker
 *.pid
+
+# AI/Dev tool artifacts
+.tldr/
+.tldrignore
