@@ -1,8 +1,9 @@
 """Tests for application configuration."""
 
 import os
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from recall.config import Settings, get_settings
 

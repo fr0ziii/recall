@@ -1,7 +1,7 @@
 """Tests for SchemaRegistry service."""
 
+
 import pytest
-from unittest.mock import AsyncMock
 
 from recall.models.collection import CreateCollectionRequest, EmbeddingConfig, FieldType, Modality
 from recall.models.errors import CollectionNotFoundError

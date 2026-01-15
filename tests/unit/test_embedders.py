@@ -1,12 +1,13 @@
 """Tests for embedder factory and implementations."""
 
-import pytest
 from unittest.mock import MagicMock, patch
-import numpy as np
 
+import numpy as np
+import pytest
+
+from recall.core.embedders.clip import CLIPEmbedder
 from recall.core.embedders.factory import EmbedderFactory
 from recall.core.embedders.text import TextEmbedder
-from recall.core.embedders.clip import CLIPEmbedder
 from recall.models.collection import Modality
 from recall.models.errors import EmbeddingError, UnsupportedModelError
 
@@ -108,31 +109,47 @@ class TestTextEmbedder:
         embedder = TextEmbedder(model)
         assert embedder.dimensions == expected_dim
 
-    def test_embed_string_content(self, mock_sentence_transformer):
-        embedder = TextEmbedder("all-MiniLM-L6-v2")
-        result = embedder.embed("test content")
-        assert isinstance(result, list)
-        assert len(result) == 384
+    def test_embed_string_content(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            instance.encode.return_value = MagicMock(tolist=lambda: [0.1] * 384)
+            mock.return_value = instance
 
-    def test_embed_bytes_content(self, mock_sentence_transformer):
-        embedder = TextEmbedder("all-MiniLM-L6-v2")
-        result = embedder.embed(b"test content")
-        assert isinstance(result, list)
+            embedder = TextEmbedder("all-MiniLM-L6-v2")
+            result = embedder.embed("test content")
+            assert isinstance(result, list)
+            assert len(result) == 384
 
-    def test_embed_batch(self, mock_sentence_transformer):
-        mock_instance = mock_sentence_transformer.return_value
-        mock_instance.encode.return_value = np.array([[0.1] * 384, [0.2] * 384])
+    def test_embed_bytes_content(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            instance.encode.return_value = MagicMock(tolist=lambda: [0.1] * 384)
+            mock.return_value = instance
 
-        embedder = TextEmbedder("all-MiniLM-L6-v2")
-        results = embedder.embed_batch(["text1", "text2"])
+            embedder = TextEmbedder("all-MiniLM-L6-v2")
+            result = embedder.embed(b"test content")
+            assert isinstance(result, list)
 
-        assert len(results) == 2
-        assert all(len(r) == 384 for r in results)
+    def test_embed_batch(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            instance.encode.return_value = np.array([[0.1] * 384, [0.2] * 384])
+            mock.return_value = instance
 
-    def test_embed_invalid_type_raises(self, mock_sentence_transformer):
-        embedder = TextEmbedder("all-MiniLM-L6-v2")
-        with pytest.raises(EmbeddingError, match="expects string content"):
-            embedder.embed(12345)
+            embedder = TextEmbedder("all-MiniLM-L6-v2")
+            results = embedder.embed_batch(["text1", "text2"])
+
+            assert len(results) == 2
+            assert all(len(r) == 384 for r in results)
+
+    def test_embed_invalid_type_raises(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            mock.return_value = instance
+
+            embedder = TextEmbedder("all-MiniLM-L6-v2")
+            with pytest.raises(EmbeddingError, match="expects string content"):
+                embedder.embed(12345)
 
 
 @pytest.mark.unit
@@ -159,12 +176,20 @@ class TestCLIPEmbedder:
         embedder = CLIPEmbedder(model)
         assert embedder.dimensions == expected_dim
 
-    def test_embed_rejects_uri_string(self, mock_clip_transformer):
-        embedder = CLIPEmbedder("clip-ViT-B-32")
-        with pytest.raises(EmbeddingError, match="content must be downloaded first"):
-            embedder.embed("https://example.com/image.jpg")
+    def test_embed_rejects_uri_string(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            mock.return_value = instance
 
-    def test_embed_rejects_s3_uri(self, mock_clip_transformer):
-        embedder = CLIPEmbedder("clip-ViT-B-32")
-        with pytest.raises(EmbeddingError, match="content must be downloaded first"):
-            embedder.embed("s3://bucket/image.jpg")
+            embedder = CLIPEmbedder("clip-ViT-B-32")
+            with pytest.raises(EmbeddingError, match="content must be downloaded first"):
+                embedder.embed("https://example.com/image.jpg")
+
+    def test_embed_rejects_s3_uri(self):
+        with patch("sentence_transformers.SentenceTransformer") as mock:
+            instance = MagicMock()
+            mock.return_value = instance
+
+            embedder = CLIPEmbedder("clip-ViT-B-32")
+            with pytest.raises(EmbeddingError, match="content must be downloaded first"):
+                embedder.embed("s3://bucket/image.jpg")

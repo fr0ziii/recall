@@ -2,6 +2,8 @@
 
 from functools import cached_property
 
+from sentence_transformers import SentenceTransformer
+
 from recall.core.embedders.base import BaseEmbedder
 from recall.models.errors import EmbeddingError
 
@@ -22,8 +24,6 @@ class TextEmbedder(BaseEmbedder):
 
     @cached_property
     def _model(self):
-        from sentence_transformers import SentenceTransformer
-
         return SentenceTransformer(self._model_name)
 
     def embed(self, content: bytes | str) -> list[float]:

@@ -5,12 +5,14 @@ Recall is a generic multimodal semantic search engine (schema-agnostic). It allo
 
 ## Tech Stack
 - **Language**: Python 3.11+
+- **Package Manager**: uv (recommended) or pip
 - **API**: FastAPI
 - **Validation**: Pydantic v2
 - **Vector DB**: Qdrant (async client)
 - **Task Queue**: Arq (Redis-based)
 - **Metadata Store**: Redis
 - **ML**: sentence-transformers (CLIP, MiniLM)
+- **Testing**: pytest, pytest-asyncio, pytest-cov, fakeredis
 
 ## Project Structure
 ```
@@ -27,10 +29,14 @@ recall/
 │   ├── api/v1/              # FastAPI routers (collections, documents, search)
 │   └── workers/             # Arq background tasks
 ├── tests/
-│   ├── unit/                # Unit tests (transpiler, embedders)
-│   └── integration/         # E2E tests (requires Docker services)
+│   ├── conftest.py          # Shared fixtures
+│   ├── unit/                # Unit tests (models, services, transpiler, embedders)
+│   │   ├── services/        # Service unit tests (registry, search, ingestion)
+│   │   └── ...
+│   ├── integration/         # API integration tests (mocked external services)
+│   └── performance/         # Performance benchmarks
 ├── docker-compose.yml       # Local dev environment
-└── pyproject.toml           # Dependencies and tool config
+└── pyproject.toml           # Dependencies and tool config (uv compatible)
 ```
 
 ## Key Design Patterns
@@ -43,7 +49,10 @@ recall/
 
 ### Development
 ```bash
-# Install dependencies
+# Install dependencies (using uv - recommended)
+uv sync --all-extras
+
+# Or using pip
 pip install -e ".[dev]"
 
 # Run API server
@@ -53,19 +62,34 @@ PYTHONPATH=src uvicorn recall.main:app --reload
 PYTHONPATH=src arq recall.workers.tasks.WorkerSettings
 
 # Start Docker services (Redis + Qdrant)
-docker-compose up -d redis qdrant
+docker compose up -d redis qdrant
+# Compose includes healthchecks + restart policies (qdrant pinned to 1.12.4)
 ```
 
 ### Testing & Linting
 ```bash
 # Run unit tests
-PYTHONPATH=src pytest tests/unit/ -v
+uv run pytest tests/unit/ -v
+
+# Run integration tests (uses mocked services)
+uv run pytest tests/integration/ -v
+
+# Run all tests with coverage
+uv run pytest tests/unit/ tests/integration/ -v --cov=recall --cov-report=term-missing
+
+# Run tests in parallel
+uv run pytest tests/ -n auto
+
+# Run tests by marker
+uv run pytest -m "unit"           # Unit tests only
+uv run pytest -m "integration"    # Integration tests only
+uv run pytest -m "not slow"       # Exclude slow tests
 
 # Run linter
-PYTHONPATH=src ruff check src/
+uv run ruff check src/ tests/
 
 # Auto-fix lint issues
-PYTHONPATH=src ruff check src/ --fix
+uv run ruff check src/ tests/ --fix
 ```
 
 ## API Endpoints

@@ -1,5 +1,7 @@
 """Transpiler from Recall DSL to Qdrant filter syntax."""
 
+from itertools import chain
+
 from qdrant_client.models import (
     FieldCondition,
     Filter,
@@ -142,19 +144,13 @@ class QdrantTranspiler:
 
     @classmethod
     def _transpile_and(cls, condition: AndFilter) -> Filter:
-        must_conditions: list[FieldCondition] = []
-        must_not_conditions: list[FieldCondition] = []
-
-        for sub in condition.conditions:
-            sub_filter = cls._transpile_condition(sub)
-            if sub_filter.must:
-                must_conditions.extend(sub_filter.must)
-            if sub_filter.must_not:
-                must_not_conditions.extend(sub_filter.must_not)
+        sub_filters = [cls._transpile_condition(sub) for sub in condition.conditions]
+        must_conditions = list(chain.from_iterable(f.must or [] for f in sub_filters))
+        must_not_conditions = list(chain.from_iterable(f.must_not or [] for f in sub_filters))
 
         return Filter(
-            must=must_conditions if must_conditions else None,
-            must_not=must_not_conditions if must_not_conditions else None,
+            must=must_conditions or None,
+            must_not=must_not_conditions or None,
         )
 
     @classmethod

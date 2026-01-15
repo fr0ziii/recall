@@ -1,12 +1,12 @@
 """Tests for SearchService."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from recall.core.vectordb.base import SearchResult as VDBSearchResult
-from recall.models.collection import Collection, EmbeddingConfig, FieldType, Modality
 from recall.models.errors import CollectionNotFoundError
-from recall.models.search import EqCondition, LtCondition, SearchRequest
+from recall.models.search import LtCondition, SearchRequest
 from recall.services.registry import SchemaRegistry
 from recall.services.search import SearchService
 
@@ -65,7 +65,7 @@ class TestSearchService:
                 filter=LtCondition(field="price", value=100),
                 limit=5,
             )
-            response = await search_service.search("test-collection", request)
+            await search_service.search("test-collection", request)
 
             mock_vectordb.search.assert_called_once()
             call_args = mock_vectordb.search.call_args

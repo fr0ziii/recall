@@ -1,7 +1,8 @@
 """Shared test fixtures and configuration."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from recall.models.collection import Collection, EmbeddingConfig, FieldType, Modality
 

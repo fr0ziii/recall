@@ -5,13 +5,12 @@ from pydantic import ValidationError
 
 from recall.models.collection import (
     Collection,
-    CollectionResponse,
     CreateCollectionRequest,
     EmbeddingConfig,
     FieldType,
     Modality,
 )
-from recall.models.document import Document, IngestRequest, IngestResponse
+from recall.models.document import Document, IngestRequest
 from recall.models.search import (
     AndFilter,
     EqCondition,

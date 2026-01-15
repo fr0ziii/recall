@@ -17,6 +17,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.115+-green.svg" alt="FastAPI">
   <img src="https://img.shields.io/badge/Pydantic-v2-orange.svg" alt="Pydantic v2">
   <img src="https://img.shields.io/badge/Vector%20DB-Qdrant-red.svg" alt="Qdrant">
+  <img src="https://img.shields.io/badge/coverage-72%25-yellowgreen.svg" alt="Coverage">
   <img src="https://img.shields.io/badge/license-MIT-lightgrey.svg" alt="License">
 </p>
 
@@ -61,11 +62,13 @@ POST /v1/collections/products/search
 # Clone and start all services
 git clone https://github.com/your-org/recall.git
 cd recall
-docker-compose up -d
+docker compose up -d
 
 # API available at http://localhost:8000
 # Swagger docs at http://localhost:8000/docs
 ```
+
+- Compose includes healthchecks/restart policies; api/worker/ui wait for healthy Redis and Qdrant (pinned to `qdrant/qdrant:1.12.4`).
 
 ### Local Development
 
@@ -74,7 +77,10 @@ docker-compose up -d
 # Install: brew install redis && brew services start redis
 # Qdrant: docker run -p 6333:6333 qdrant/qdrant
 
-# Install dependencies
+# Install dependencies (using uv - recommended)
+uv sync --all-extras
+
+# Or using pip
 pip install -e ".[dev]"
 
 # Start the API server
@@ -331,38 +337,58 @@ recall/
 │   ├── api/v1/                 # API endpoints
 │   └── workers/                # Background tasks
 ├── tests/
-│   ├── unit/                   # Unit tests
-│   └── integration/            # Integration tests
+│   ├── conftest.py             # Shared test fixtures
+│   ├── unit/                   # Unit tests (models, services, core)
+│   │   └── services/           # Service unit tests
+│   ├── integration/            # API integration tests
+│   └── performance/            # Performance benchmarks
 ├── docker-compose.yml
 ├── Dockerfile
-└── pyproject.toml
+└── pyproject.toml              # uv-compatible config
 ```
 
 ### Running Tests
 
+The project includes a comprehensive test suite with 160+ tests covering unit, integration, and performance testing.
+
 ```bash
-# Unit tests
-PYTHONPATH=src pytest tests/unit/ -v
+# Unit tests (fast, no external dependencies)
+uv run pytest tests/unit/ -v
 
-# With coverage
-PYTHONPATH=src pytest tests/unit/ -v --cov=src/recall
+# Integration tests (uses mocked external services)
+uv run pytest tests/integration/ -v
 
-# Integration tests (requires Docker services)
-docker-compose up -d redis qdrant
-PYTHONPATH=src pytest tests/integration/ -v
+# All tests with coverage report
+uv run pytest tests/unit/ tests/integration/ -v --cov=recall --cov-report=term-missing
+
+# Run tests in parallel (faster)
+uv run pytest tests/ -n auto
+
+# Run by marker
+uv run pytest -m "unit"           # Unit tests only
+uv run pytest -m "integration"    # Integration tests only
+uv run pytest -m "not slow"       # Exclude slow tests (model loading)
+
+# Performance benchmarks
+uv run pytest tests/performance/ -v -m slow
 ```
+
+**Test markers:**
+- `unit` - Fast unit tests with mocked dependencies
+- `integration` - API integration tests with mocked Redis/Qdrant
+- `slow` - Tests that load ML models (slower)
 
 ### Linting & Formatting
 
 ```bash
 # Check for issues
-PYTHONPATH=src ruff check src/
+uv run ruff check src/ tests/
 
 # Auto-fix issues
-PYTHONPATH=src ruff check src/ --fix
+uv run ruff check src/ tests/ --fix
 
 # Format code
-PYTHONPATH=src ruff format src/
+uv run ruff format src/ tests/
 ```
 
 ### Adding a New Embedding Model

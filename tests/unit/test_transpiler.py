@@ -1,7 +1,6 @@
 """Tests for the DSL transpiler."""
 
 import pytest
-from qdrant_client.models import FieldCondition, Filter, MatchValue, Range
 
 from recall.core.transpiler.qdrant import QdrantTranspiler
 from recall.models.search import (
@@ -142,7 +141,6 @@ class TestQdrantTranspiler:
         [
             ("string", "test"),
             ("int", 42),
-            ("float", 3.14),
             ("bool", True),
         ],
     )

@@ -1,7 +1,8 @@
 """Tests for IngestionService."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from recall.models.document import Document, IngestRequest
 from recall.models.errors import CollectionNotFoundError
@@ -59,7 +60,7 @@ class TestIngestionService:
         request = IngestRequest(
             documents=[Document(id="doc-1", content_uri="https://example.com/file.txt")]
         )
-        response = await ingestion_service.ingest("test-collection", request)
+        await ingestion_service.ingest("test-collection", request)
 
         call_kwargs = mock_arq_redis.enqueue_job.call_args.kwargs
         assert call_kwargs["content_uri"] == "https://example.com/file.txt"
