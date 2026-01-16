@@ -55,7 +55,7 @@
   }
 
   .gradient-mesh {
-    background: 
+    background:
       radial-gradient(at 20% 30%, rgba(0, 122, 255, 0.06) 0px, transparent 50%),
       radial-gradient(at 80% 20%, rgba(175, 82, 222, 0.05) 0px, transparent 50%),
       radial-gradient(at 40% 80%, rgba(255, 149, 0, 0.04) 0px, transparent 50%);
@@ -116,5 +116,21 @@
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-apple via-grape to-apricot bg-clip-text text-transparent;
+  }
+
+  /* Long list optimization (Section 6.2 - React Best Practices) */
+  .document-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 120px;
+  }
+
+  /* Tab button styling */
+  .tab-button {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-all;
+    @apply text-ink-100 hover:text-ink hover:bg-cloud-200;
+  }
+
+  .tab-button.active {
+    @apply bg-white text-ink shadow-soft;
   }
 }

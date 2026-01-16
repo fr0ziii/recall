@@ -2,10 +2,12 @@ import type {
   Collection,
   CollectionResponse,
   CreateCollectionRequest,
+  DocumentListResponse,
   IngestRequest,
   IngestResponse,
   SearchRequest,
   SearchResponse,
+  TaskStatusResponse,
 } from '../types/recall';
 
 const API_BASE = '/v1';
@@ -92,6 +94,26 @@ export const recallApi = {
   async getSupportedModels(): Promise<string[]> {
     const response = await fetch(`${API_BASE}/collections/models/supported`);
     return handleResponse<string[]>(response);
+  },
+
+  async getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
+    const response = await fetch(`${API_BASE}/tasks/${encodeURIComponent(taskId)}`);
+    return handleResponse<TaskStatusResponse>(response);
+  },
+
+  async listDocuments(
+    collectionName: string,
+    limit = 20,
+    offset = 0
+  ): Promise<DocumentListResponse> {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      offset: String(offset),
+    });
+    const response = await fetch(
+      `${API_BASE}/collections/${encodeURIComponent(collectionName)}/documents?${params}`
+    );
+    return handleResponse<DocumentListResponse>(response);
   },
 
   async healthCheck(): Promise<{ status: string }> {

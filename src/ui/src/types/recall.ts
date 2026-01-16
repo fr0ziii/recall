@@ -86,3 +86,40 @@ export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
 }
+
+// Task tracking types
+export type JobStatusType = 'queued' | 'in_progress' | 'complete' | 'failed' | 'not_found';
+
+export interface JobStatus {
+  doc_id: string;
+  status: JobStatusType;
+  result?: Record<string, unknown>;
+  error?: string;
+}
+
+export interface TaskSummary {
+  total: number;
+  queued: number;
+  in_progress: number;
+  complete: number;
+  failed: number;
+}
+
+export interface TaskStatusResponse {
+  task_id: string;
+  jobs: JobStatus[];
+  summary: TaskSummary;
+}
+
+// Document browsing types
+export interface DocumentPoint {
+  id: string;
+  payload: Record<string, unknown> | null;
+}
+
+export interface DocumentListResponse {
+  documents: DocumentPoint[];
+  total: number;
+  limit: number;
+  offset: number;
+}

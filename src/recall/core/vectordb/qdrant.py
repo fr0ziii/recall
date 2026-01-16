@@ -127,6 +127,43 @@ class QdrantAdapter(VectorDBClient):
         except Exception as e:
             raise VectorDBError(str(e), "search") from e
 
+    async def scroll(
+        self,
+        collection: str,
+        limit: int = 20,
+        offset: int = 0,
+        with_payload: bool = True,
+        with_vectors: bool = False,
+    ) -> list[SearchResult]:
+        try:
+            # Use scroll API for offset-based pagination
+            results, _next_offset = await self.client.scroll(
+                collection_name=collection,
+                limit=limit,
+                offset=offset,
+                with_payload=with_payload,
+                with_vectors=with_vectors,
+            )
+
+            return [
+                SearchResult(
+                    id=str(point.id),
+                    score=0.0,  # No score for scroll results
+                    payload=dict(point.payload) if point.payload else None,
+                    vector=list(point.vector) if with_vectors and point.vector else None,
+                )
+                for point in results
+            ]
+        except Exception as e:
+            raise VectorDBError(str(e), "scroll") from e
+
+    async def count(self, collection: str) -> int:
+        try:
+            result = await self.client.count(collection_name=collection)
+            return result.count
+        except Exception as e:
+            raise VectorDBError(str(e), "count") from e
+
     async def close(self) -> None:
         if self._client:
             await self._client.close()

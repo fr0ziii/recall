@@ -42,32 +42,36 @@ async def get_task_status(
         doc_id = job_id.split(":", 1)[1] if ":" in job_id else job_id
 
         job = Job(job_id, arq_redis)
-        info = await job.info()
+        
+        # Use job.status() method instead of info.status attribute
+        status = await job.status()
+        status_str = ARQ_STATUS_MAP.get(status, "queued")
 
-        if info is None:
-            jobs.append(JobStatus(doc_id=doc_id, status="not_found"))
-            continue
-
-        status = ARQ_STATUS_MAP.get(info.status, "queued")
-
-        if info.status == ArqJobStatus.complete:
-            if info.success:
+        if status == ArqJobStatus.complete:
+            # Use result_info() to get result details
+            result_info = await job.result_info()
+            if result_info and result_info.success:
                 summary_counts["complete"] += 1
                 jobs.append(JobStatus(
                     doc_id=doc_id,
                     status="complete",
-                    result=info.result if isinstance(info.result, dict) else None,
+                    result=result_info.result if isinstance(result_info.result, dict) else None,
                 ))
             else:
                 summary_counts["failed"] += 1
+                error_msg = "Unknown error"
+                if result_info and result_info.result:
+                    error_msg = str(result_info.result)
                 jobs.append(JobStatus(
                     doc_id=doc_id,
                     status="failed",
-                    error=str(info.result) if info.result else "Unknown error",
+                    error=error_msg,
                 ))
+        elif status == ArqJobStatus.not_found:
+            jobs.append(JobStatus(doc_id=doc_id, status="not_found"))
         else:
-            summary_counts[status] = summary_counts.get(status, 0) + 1
-            jobs.append(JobStatus(doc_id=doc_id, status=status))
+            summary_counts[status_str] = summary_counts.get(status_str, 0) + 1
+            jobs.append(JobStatus(doc_id=doc_id, status=status_str))
 
     return TaskStatusResponse(
         task_id=task_id,

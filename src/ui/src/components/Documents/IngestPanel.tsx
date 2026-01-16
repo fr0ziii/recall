@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlowButton } from '../Shared/GlowButton';
+import { TaskProgress } from './TaskProgress';
 import { useIngestDocuments } from '../../hooks/useRecall';
 import type { Document, IngestResponse } from '../../types/recall';
 
@@ -90,6 +91,14 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
     setError(null);
   };
 
+  const handleTaskComplete = () => {
+    // Could invalidate queries or show a notification here
+  };
+
+  const handleIngestMore = () => {
+    handleReset();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -140,8 +149,8 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                       key={m.id}
                       onClick={() => setMode(m.id)}
                       className={`p-3 rounded-xl border text-center transition-all ${mode === m.id
-                          ? 'bg-apple-50 border-apple text-apple'
-                          : 'bg-cloud-100 border-cloud-400 text-ink-200 hover:border-ink-50'
+                        ? 'bg-apple-50 border-apple text-apple'
+                        : 'bg-cloud-100 border-cloud-400 text-ink-200 hover:border-ink-50'
                         }`}
                     >
                       <span className="block text-lg mb-1">{m.icon}</span>
@@ -235,19 +244,13 @@ export function IngestPanel({ collectionName, isOpen, onClose }: IngestPanelProp
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl"
+                  className="mt-4"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm font-medium text-emerald-700">Ingestion Queued</span>
-                  </div>
-                  <div className="space-y-1 text-xs font-mono text-ink-200">
-                    <p>Task ID: {result.task_id}</p>
-                    <p>Documents queued: {result.documents_queued}</p>
-                    <p>Status: {result.status}</p>
-                  </div>
+                  <TaskProgress
+                    taskId={result.task_id}
+                    onComplete={handleTaskComplete}
+                    onClose={handleIngestMore}
+                  />
                 </motion.div>
               )}
             </div>

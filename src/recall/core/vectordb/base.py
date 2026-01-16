@@ -106,6 +106,41 @@ class VectorDBClient(ABC):
         ...
 
     @abstractmethod
+    async def scroll(
+        self,
+        collection: str,
+        limit: int = 20,
+        offset: int = 0,
+        with_payload: bool = True,
+        with_vectors: bool = False,
+    ) -> list[SearchResult]:
+        """Scroll through all points in a collection.
+
+        Args:
+            collection: Collection name
+            limit: Maximum results to return
+            offset: Starting position for pagination
+            with_payload: Include payload in results
+            with_vectors: Include vectors in results
+
+        Returns:
+            List of points
+        """
+        ...
+
+    @abstractmethod
+    async def count(self, collection: str) -> int:
+        """Count total points in a collection.
+
+        Args:
+            collection: Collection name
+
+        Returns:
+            Total number of points
+        """
+        ...
+
+    @abstractmethod
     async def close(self) -> None:
         """Close the client connection."""
         ...

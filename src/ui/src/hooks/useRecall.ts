@@ -66,6 +66,34 @@ export function useSupportedModels() {
   });
 }
 
+// Task status polling with auto-stop when complete
+export function useTaskStatus(taskId: string | null) {
+  return useQuery({
+    queryKey: ['task', taskId] as const,
+    queryFn: () => recallApi.getTaskStatus(taskId!),
+    enabled: !!taskId,
+    // SWR-style automatic deduplication via TanStack Query
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (!data) return 1000;
+      // Stop polling when all jobs are complete or failed
+      const { complete, failed, total } = data.summary;
+      return complete + failed >= total ? false : 1000;
+    },
+  });
+}
+
+// Paginated document fetching
+export function useDocuments(collectionName: string, limit = 20, offset = 0) {
+  return useQuery({
+    queryKey: ['documents', collectionName, limit, offset] as const,
+    queryFn: () => recallApi.listDocuments(collectionName, limit, offset),
+    enabled: !!collectionName,
+    // Narrow dependencies: only refetch when primitives change
+    staleTime: 30000,
+  });
+}
+
 export function useHealthCheck() {
   return useQuery({
     queryKey: queryKeys.health,
